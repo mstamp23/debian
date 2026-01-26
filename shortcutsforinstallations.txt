@@ -5,3 +5,10 @@ http://tinyurl.com/5n8bzsar
 https://tinyurl.com/5n8bzsar
 https://raw.githubusercontent.com/mstamp23/debian/refs/heads/main/preseed.cfg
 
+
+http://tinyurl.com/2smrhf2x
+
+https://tinyurl.com/2smrhf2x
+
+https://raw.githubusercontent.com/mstamp23/debian/refs/heads/main/preseedforlaptop.cfg
+
