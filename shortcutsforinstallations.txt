@@ -1,0 +1,7 @@
+http://tinyurl.com/5n8bzsar
+
+#http not https, is safer
+
+https://tinyurl.com/5n8bzsar
+https://raw.githubusercontent.com/mstamp23/debian/refs/heads/main/preseed.cfg
+
