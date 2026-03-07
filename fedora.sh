@@ -1,27 +1,36 @@
 #!/bin/bash
-# 1. Test Network Connectivity
-echo "Checking network status..."
-ping -c 3 google.com || { echo "No internet. Use 'nmcli device connect' first."; exit 1; }
+# 1. Test Network and Auto-Connect if needed
+echo "Checking network connectivity..."
+if ! ping -c 3 google.com > /dev/null 2>&1; then
+    echo "No internet detected. Attempting to bring up interface via nmcli..."
+    # Finds the first physical device that isn't the loopback 'lo'
+    INTERFACE=$(nmcli -t -f DEVICE device | grep -v "^lo$" | head -n 1)
+    if [ -n "$INTERFACE" ]; then
+        nmcli device connect "$INTERFACE"
+        sleep 2
+    else
+        echo "Error: No network interface found."
+        exit 1
+    fi
+fi
 
-# 2. Install GUI, X11, and the Greeter
-echo "Installing XFCE and Display Manager..."
+# Re-verify after attempt
+ping -c 3 google.com || { echo "Still no internet. Check your cable/WiFi."; exit 1; }
+
+# 2. Install GUI and X11
+echo "Installing Xfce and X11..."
 dnf groupinstall -y "Xfce" "base-x"
-dnf install -y lightdm lightdm-gtk-greeter mousepad
+dnf install -y lightdm lightdm-gtk-greeter
 
-# 3. Configure Autologin for user 'm'
-echo "Configuring autologin for user m..."
-mkdir -p /etc/lightdm/lightdm.conf.d/
-echo -e "[Seat:*]\nautologin-user=m\nautologin-user-timeout=0" > /etc/lightdm/lightdm.conf.d/01-autologin.conf
-
-# 4. Set System Targets
-echo "Setting graphical target..."
+# 3. Set up the Environment
+echo "Configuring system targets..."
 systemctl set-default graphical.target
 systemctl enable lightdm
 
-# 5. Final Log Check for Errors
-echo "Installation complete. Checking logs for critical errors..."
+# 4. Final Log Check before starting
+echo "Installation complete. Checking logs for errors..."
 journalctl -p 3 -xb --no-pager | tail -n 10
 
-# 6. Start the GUI
-echo "Starting GUI..."
+# 5. Start GUI
+echo "Launching GUI..."
 systemctl start lightdm
